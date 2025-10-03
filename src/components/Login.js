@@ -3,8 +3,7 @@ import { useRef, useState } from "react"
 import loginValidation from "../utils/validation"
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../utils/firebase";
-
-
+import { BACKGROUND } from "../utils/constants";
 const Login = () => {
     const emailRef = useRef(null)
     const passwordRef = useRef(null)
@@ -22,10 +21,8 @@ const Login = () => {
                 .then((userCredential) => {
                     // Signed up 
                     const user = userCredential.user;
-                    // ...
                 })
                 .catch((error) => {
-                    const errorCode = error.code;
                     const errorMessage = error.message;
                     setErrorMessage(errorMessage)
                     // ..
@@ -35,11 +32,9 @@ const Login = () => {
                 .then((userCredential) => {
                     // Signed in 
                     const user = userCredential.user;
-                    console.log(user)
-                    // ...
+
                 })
                 .catch((error) => {
-                    const errorCode = error.code;
                     const errorMessage = error.message;
                     setErrorMessage(errorMessage)
                     // ..
@@ -54,7 +49,7 @@ const Login = () => {
             <div className="absolute inset-0">
                 <img
                     className="h-full w-full object-cover"
-                    src="https://assets.nflxext.com/ffe/siteui/vlv3/bebd95d0-65f9-41a9-9d12-4794db63653e/web/IN-en-20250922-TRIFECTA-perspective_5e75cfb4-3797-4f17-866b-181ff91a51dd_large.jpg"
+                    src={BACKGROUND}
                     alt="Netflix Login"
                 />
                 <div className="absolute inset-0 bg-black opacity-50"></div>

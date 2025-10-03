@@ -1,6 +1,39 @@
 import { FaSearch } from "react-icons/fa";
+import { signOut } from "firebase/auth";
+import { auth } from "../utils/firebase";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { useDispatch } from "react-redux";
+import { addUser, removeUser } from "../utils/userSlice";
+import { AVATAR, LOGO } from "../utils/constants";
 
 const Header = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const handleSignOut = () => {
+    signOut(auth).then(() => {
+      navigate("/");
+    }).catch((error) => {
+      console.log(error);
+    });
+  };
+  useEffect(() => {
+   const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        dispatch(addUser({
+          uid: user.uid,
+          email: user.email,
+          name: user.displayName
+        }))
+        navigate("/browse")
+      } else {
+        dispatch(removeUser())
+        navigate("/")
+      }
+    });
+    return () => unsubscribe();
+  }, [])
   return (
     <div className="absolute top-0 left-0 w-full flex items-center justify-between bg-gradient-to-b from-black to-transparent px-8 py-4 z-50">
       {/* Left: Logo + Nav */}
@@ -8,7 +41,7 @@ const Header = () => {
         {/* Netflix Logo */}
         <img
           className="w-28 cursor-pointer"
-          src="https://www.freepnglogos.com/uploads/netflix-logo-0.png"
+          src={LOGO}
           alt="Netflix Logo"
         />
 
@@ -27,9 +60,10 @@ const Header = () => {
         <FaSearch className="cursor-pointer hover:text-gray-300" />
         <img
           className="w-8 h-8 rounded-md cursor-pointer"
-          src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png"
+          src={AVATAR}
           alt="Profile"
         />
+        <button onClick={handleSignOut}>Sign Out</button>
       </div>
     </div>
   );
