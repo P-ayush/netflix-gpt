@@ -4,9 +4,11 @@ import { auth } from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { useDispatch } from "react-redux";
+import { useDispatch,useSelector } from "react-redux";
 import { addUser, removeUser } from "../utils/userSlice";
-import { AVATAR, LOGO } from "../utils/constants";
+import { AVATAR, LOGO, LANGUAGES } from "../utils/constants";
+import { toggleGptSearchView } from "../utils/gptSlice";
+import { changeLanguage } from "../utils/configSlice";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -19,7 +21,7 @@ const Header = () => {
     });
   };
   useEffect(() => {
-   const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         dispatch(addUser({
           uid: user.uid,
@@ -34,6 +36,13 @@ const Header = () => {
     });
     return () => unsubscribe();
   }, [])
+  const handleGptSearchClick = () => {
+    dispatch(toggleGptSearchView())
+  }
+  const handleLanguageChange = (e) => {
+    dispatch(changeLanguage(e.target.value))
+  }
+  const gptSearchView = useSelector((store) => store.gpt.showGptSearch)
   return (
     <div className="absolute top-0 left-0 w-full flex items-center justify-between bg-gradient-to-b from-black to-transparent px-8 py-4 z-50">
       {/* Left: Logo + Nav */}
@@ -57,6 +66,12 @@ const Header = () => {
 
       {/* Right: Search + Avatar */}
       <div className="flex items-center gap-6 text-white">
+       {gptSearchView && <select className="bg-gray-600 bg-opacity-70 text-white font-semibold px-6 py-2 rounded-md hover:bg-gray-500 transition duration-300" onChange={handleLanguageChange}>
+          {LANGUAGES.map((language) => (
+            <option key={language.code} value={language.code}>{language.name}</option>
+          ))}
+        </select>}
+        < button className="bg-gray-600 bg-opacity-70 text-white font-semibold px-6 py-2 rounded-md hover:bg-gray-500 transition duration-300" onClick={handleGptSearchClick} >{gptSearchView ? "Home Page" : "GPT Search"}</button>
         <FaSearch className="cursor-pointer hover:text-gray-300" />
         <img
           className="w-8 h-8 rounded-md cursor-pointer"
